@@ -6,6 +6,10 @@
 
 A lexer in rust, which handles doublequoted string.
 
+- no DSL, just rust code
+  - for lexer is much more simple than parser
+- to serve as the fontend of parsing-tech
+
 ## Contributing
 
 We use Collective Code Construction Contract -- a.k.a. C4, as our collaboration protocol.
