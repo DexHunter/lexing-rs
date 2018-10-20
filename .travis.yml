@@ -5,20 +5,6 @@ rust:
 
 cache: cargo
 
-before_script:
-  - (test -x $HOME/.cargo/bin/mdbook || cargo install mdbook)
-
 script:
   - cargo build
-  - cargo test -- --nocapture
-  - mdbook build docs
-  - cargo doc && cp -r target/doc docs/book/api
-
-deploy:
-  provider: pages
-  skip-cleanup: true
-  github-token: $GITHUB_TOKEN
-  local-dir: docs/book
-  keep-history: false
-  on:
-    branch: master
+  - cargo test

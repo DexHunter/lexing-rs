@@ -1,20 +1,101 @@
 #+property: tangle lib.rs
 #+title: lexing
-- test this lexer in jojo
-* ><
+- test_lexing
+- use this lexer in jojo
+* prolog
 
-  #+begin_src rust
+*** feature
 
-  #+end_src
+    #+begin_src rust
+    #![feature (uniform_paths)]
+
+    #![allow (unused_parens)]
+    #![allow (dead_code)]
+    #![allow (unused_macros)]
+    #+end_src
+
+*** use
+
+    #+begin_src rust
+    use std::collections::HashSet;
+    #+end_src
+
+* CharTable
+
+*** CharTable
+
+    #+begin_src rust
+    #[derive (Clone)]
+    #[derive (Debug)]
+    #[derive (PartialEq, Eq)]
+    pub struct CharTable {
+        pub quotation_mark_vec: HashSet <char>,
+        pub char_vec: HashSet <char>,
+    }
+    #+end_src
+
+* Token
+
+*** Token
+
+    #+begin_src rust
+    #[derive (Clone)]
+    #[derive (Debug)]
+    #[derive (PartialEq, Eq)]
+    pub enum Token {
+        Quote {
+            quotation_mark: char,
+            string: String,
+            span: Span,
+        },
+        Word {
+            word: String,
+            span: Span,
+        },
+        Char {
+            ch: char,
+            span: Span,
+        },
+    }
+    #+end_src
+
+*** Span
+
+    #+begin_src rust
+    #[derive (Clone)]
+    #[derive (Debug)]
+    #[derive (PartialEq, Eq)]
+    pub struct Span {
+        pub lo: usize,
+        pub hi: usize,
+    }
+    #+end_src
+
+*** LexingError
+
+    #+begin_src rust
+    #[derive (Clone)]
+    #[derive (Debug)]
+    #[derive (PartialEq, Eq)]
+    pub struct LexingError;
+    #+end_src
 
 * test
 
-  #+begin_src rust
-  #[cfg(test)]
-  mod tests {
-      #[test]
-      fn it_works() {
-          assert_eq!(2 + 2, 4);
-      }
-  }
-  #+end_src
+*** test_lexing
+
+    #+begin_src rust
+    #[test]
+    fn test_lexing () -> Result<(), LexingError> {
+        Ok (())
+    }
+    #+end_src
+
+*** play
+
+    #+begin_src rust
+    #[test]
+    fn play () {
+
+    }
+    #+end_src
