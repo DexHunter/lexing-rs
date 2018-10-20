@@ -1,0 +1,21 @@
+[[package]]
+name = "lexing"
+version = "0.1.0"
+dependencies = [
+ "md-tangle-engine 0.1.4 (git+https://github.com/parsing-tech/md-rs)",
+ "org-tangle-engine 0.1.9 (git+https://github.com/parsing-tech/org-rs)",
+]
+
+[[package]]
+name = "md-tangle-engine"
+version = "0.1.4"
+source = "git+https://github.com/parsing-tech/md-rs#a6e44069a6f77eb8dd20fcf2eb606013c47a783d"
+
+[[package]]
+name = "org-tangle-engine"
+version = "0.1.9"
+source = "git+https://github.com/parsing-tech/org-rs#a21275b10c1832adac09a45849f192fb25bc5f45"
+
+[metadata]
+"checksum md-tangle-engine 0.1.4 (git+https://github.com/parsing-tech/md-rs)" = "<none>"
+"checksum org-tangle-engine 0.1.9 (git+https://github.com/parsing-tech/org-rs)" = "<none>"
