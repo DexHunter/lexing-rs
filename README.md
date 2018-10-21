@@ -11,6 +11,8 @@ A lexer in rust, which handles doublequoted string.
   - for lexer is much more simple than parser
 - to serve as the fontend of parsing-tech
 
+## Docs
+
 - [API docs](https://parsing-tech.github.io/lexing-rs/api/lexing)
 
 ## Contributing
