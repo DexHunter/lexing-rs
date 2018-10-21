@@ -58,7 +58,13 @@ impl Span {
 #[derive (Clone)]
 #[derive (Debug)]
 #[derive (PartialEq, Eq)]
-pub struct LexError;
+pub enum LexError {
+    QuotationMisMatch {
+        quotation_mark: char,
+        index: usize,
+    },
+    Internal,
+}
 
 #[derive (Clone)]
 #[derive (Debug)]
@@ -180,18 +186,24 @@ impl <'a> Lexing <'a> {
     }
 }
 
+// assumptions :
+// - Lexing is not finished_p
+// - spaces are ignored
 impl <'a> Lexing <'a> {
-    pub fn next_token (
+    fn next_token (
         &mut self,
     ) -> Result <(), LexError> {
         let progress = &self.input [self.cursor ..];
-        let ch = progress.chars () .next () .unwrap ();
-        if self.char_table.char_p (ch) {
-            self.next_char (ch)
-        } else if self.char_table.quotation_mark_p (ch) {
-            self.next_quote (ch)
+        if let Some (ch) = progress.chars () .next () {
+            if self.char_table.char_p (ch) {
+                self.next_char (ch)
+            } else if self.char_table.quotation_mark_p (ch) {
+                self.next_quote (ch)
+            } else {
+                self.next_word ()
+            }
         } else {
-            self.next_word ()
+            Err (LexError::Internal)
         }
     }
 }
@@ -231,7 +243,10 @@ impl <'a> Lexing <'a> {
             self.token_vec.push (token);
             Ok (())
         } else {
-            Err (LexError)
+            Err (LexError::QuotationMisMatch {
+                quotation_mark,
+                index: lo,
+            })
         }
     }
 }
@@ -341,6 +356,27 @@ fn test_lexing_unicode () -> Result<(), LexError> {
         }
     );
     assert_eq! (iter.next (), None);
+    Ok (())
+}
+
+#[test]
+fn test_error () -> Result<(), LexError> {
+    let char_table = CharTable::new ()
+        .quotation_mark ('"')
+        .space ('\n') .space ('\t') .space (' ')
+        .char (';');
+    let input = r#"aa "sss c;"#;
+    assert! (
+        if let Err (LexError::QuotationMisMatch {
+            quotation_mark,
+            index,
+        }) = char_table.lex (input) {
+            (quotation_mark == '"' &&
+             index == 3)
+        } else {
+            false
+        }
+    );
     Ok (())
 }
 
