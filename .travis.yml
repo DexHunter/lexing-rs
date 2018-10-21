@@ -8,7 +8,7 @@ cache: cargo
 script:
   - cargo build
   - cargo test -- --nocapture
-  - cargo doc && mv -r target/doc docs/api
+  - cargo doc && mv target/doc docs/api
 
 deploy:
   provider: pages
