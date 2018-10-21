@@ -6,6 +6,7 @@
 
 A lexer in rust, which handles doublequoted string.
 
+- zero copy
 - no DSL, just rust code
   - for lexer is much more simple than parser
 - to serve as the fontend of parsing-tech
