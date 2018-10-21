@@ -279,14 +279,28 @@ fn test_lexing () -> Result<(), LexError> {
     let char_table = CharTable::new ()
         .quotation_mark ('"')
         .space ('\n') .space ('\t') .space (' ')
-        .char ('(') .char (')')
-        .char ('[') .char (']')
-        .char ('{') .char ('}')
         .char (';');
-    let input = r#"
-    "sss" aaa "sss" bb "sss" c;
-    "#;
+    let input = r#"aa "sss" c;"#;
     let token_vec = char_table.lex (input)?;
+    let mut iter = token_vec.iter ();
+    assert_eq! (iter.next (), Some (&Token::Word {
+        span: Span { lo: 0, hi: 2 },
+        word: "aa",
+    }));
+    assert_eq! (iter.next (), Some (&Token::Quotation {
+        span: Span { lo: 3, hi: 8 },
+        quotation_mark: '"',
+        string: "sss",
+    }));
+    assert_eq! (iter.next (), Some (&Token::Word {
+        span: Span { lo: 9, hi: 10 },
+        word: "c",
+    }));
+    assert_eq! (iter.next (), Some (&Token::Char {
+        span: Span { lo: 10, hi: 11 },
+        ch: ';',
+    }));
+    assert_eq! (iter.next (), None);
     println! ("- token_vec = {:#?}", token_vec);
     Ok (())
 }
