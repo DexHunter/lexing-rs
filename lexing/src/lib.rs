@@ -283,25 +283,64 @@ fn test_lexing () -> Result<(), LexError> {
     let input = r#"aa "sss" c;"#;
     let token_vec = char_table.lex (input)?;
     let mut iter = token_vec.iter ();
-    assert_eq! (iter.next (), Some (&Token::Word {
+    assert_eq! (iter.next () .unwrap (), &Token::Word {
         span: Span { lo: 0, hi: 2 },
         word: "aa",
-    }));
-    assert_eq! (iter.next (), Some (&Token::Quotation {
+    });
+    assert_eq! (iter.next () .unwrap (), &Token::Quotation {
         span: Span { lo: 3, hi: 8 },
         quotation_mark: '"',
         string: "sss",
-    }));
-    assert_eq! (iter.next (), Some (&Token::Word {
+    });
+    assert_eq! (iter.next () .unwrap (), &Token::Word {
         span: Span { lo: 9, hi: 10 },
         word: "c",
-    }));
-    assert_eq! (iter.next (), Some (&Token::Char {
+    });
+    assert_eq! (iter.next () .unwrap (), &Token::Char {
         span: Span { lo: 10, hi: 11 },
         ch: ';',
-    }));
+    });
     assert_eq! (iter.next (), None);
-    println! ("- token_vec = {:#?}", token_vec);
+    Ok (())
+}
+
+#[test]
+fn test_lexing_unicode () -> Result<(), LexError> {
+    let char_table = CharTable::new ()
+        .space ('\n') .space ('\t') .space (' ')
+        .char ('「') .char ('」');
+    let input = r#"子游曰「敢問其方」"#;
+    let token_vec = char_table.lex (input)?;
+    let mut iter = token_vec.iter ();
+    assert! (
+        if let Some (Token::Word { word, .. }) = iter.next () {
+            word == &"子游曰"
+        } else {
+            false
+        }
+    );
+    assert! (
+        if let Some (Token::Char { ch, .. }) = iter.next () {
+            ch == &'「'
+        } else {
+            false
+        }
+    );
+    assert! (
+        if let Some (Token::Word { word, .. }) = iter.next () {
+            word == &"敢問其方"
+        } else {
+            false
+        }
+    );
+    assert! (
+        if let Some (Token::Char { ch, .. }) = iter.next () {
+            ch == &'」'
+        } else {
+            false
+        }
+    );
+    assert_eq! (iter.next (), None);
     Ok (())
 }
 
