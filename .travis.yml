@@ -7,4 +7,14 @@ cache: cargo
 
 script:
   - cargo build
-  - cargo test
+  - cargo test -- --nocapture
+  - cargo doc && cp -r target/doc docs/api
+
+deploy:
+  provider: pages
+  skip-cleanup: true
+  github-token: $GITHUB_TOKEN
+  local-dir: docs
+  keep-history: false
+  on:
+    branch: master
