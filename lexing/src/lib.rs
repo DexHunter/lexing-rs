@@ -86,10 +86,10 @@ impl CharTable {
 }
 
 impl CharTable {
-     fn quotation_mark (mut self, ch: char) -> Self {
+    fn quotation_mark (mut self, ch: char) -> Self {
         self.quotation_mark_set.insert (ch);
         self
-     }
+    }
 }
 
 impl CharTable {
@@ -210,7 +210,8 @@ impl <'a> Lexing <'a> {
 
 impl <'a> Lexing <'a> {
     fn next_char (
-        &mut self, ch: char,
+        &mut self,
+        ch: char,
     ) -> Result <(), LexError> {
         let lo = self.cursor;
         let ch_len = ch.len_utf8 ();
@@ -225,13 +226,16 @@ impl <'a> Lexing <'a> {
 
 impl <'a> Lexing <'a> {
     fn next_quote (
-        &mut self, quotation_mark: char,
+        &mut self,
+        quotation_mark: char,
     ) -> Result <(), LexError> {
         let lo = self.cursor;
         let ch_len = quotation_mark.len_utf8 ();
         self.cursor += ch_len;
         let progress = &self.input [self.cursor ..];
-        if let Some (quote_end) = progress.find (quotation_mark) {
+        if let Some (
+            quote_end
+        ) = find_quote_end (progress, quotation_mark) {
             let string = &progress [.. quote_end];
             self.cursor += string.len ();
             self.cursor += ch_len;
@@ -268,6 +272,33 @@ impl <'a> Lexing <'a> {
             } else {
                 return;
             }
+        }
+    }
+}
+
+fn find_quote_end (
+    string: &str,
+    quotation_mark: char,
+) -> Option <usize> {
+    let mut cursor = 0;
+    loop {
+        let progress = &string [cursor ..];
+        let mut chars = progress.chars ();
+        if let Some (ch) = chars.next () {
+            if ch == quotation_mark {
+                return Some (cursor);
+            } else if ch == '\\' {
+                cursor += 1;
+                if let Some (ch) = chars.next () {
+                    cursor += ch.len_utf8 ();
+                } else {
+                    return None;
+                }
+            } else {
+                cursor += ch.len_utf8 ();
+            }
+        } else {
+            return None;
         }
     }
 }
@@ -381,6 +412,31 @@ fn test_error () -> Result<(), LexError> {
 }
 
 #[test]
-fn play () {
-
+fn test_escape () -> Result<(), LexError> {
+    let char_table = CharTable::new ()
+        .quotation_mark ('"')
+        .space ('\n') .space ('\t') .space (' ')
+        .char (';');
+    let input = r#"aa "s\"" c;"#;
+    let token_vec = char_table.lex (input)?;
+    let mut iter = token_vec.iter ();
+    assert_eq! (iter.next () .unwrap (), &Token::Word {
+        span: Span { lo: 0, hi: 2 },
+        word: "aa",
+    });
+    assert_eq! (iter.next () .unwrap (), &Token::Quotation {
+        span: Span { lo: 3, hi: 8 },
+        quotation_mark: '"',
+        string: r#"s\""#,
+    });
+    assert_eq! (iter.next () .unwrap (), &Token::Word {
+        span: Span { lo: 9, hi: 10 },
+        word: "c",
+    });
+    assert_eq! (iter.next () .unwrap (), &Token::Char {
+        span: Span { lo: 10, hi: 11 },
+        ch: ';',
+    });
+    assert_eq! (iter.next (), None);
+    Ok (())
 }
