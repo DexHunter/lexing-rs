@@ -76,7 +76,7 @@ pub struct CharTable {
 }
 
 impl CharTable {
-    fn new () -> Self {
+    pub fn new () -> Self {
         CharTable {
             quotation_mark_set: HashSet::new (),
             space_set: HashSet::new (),
@@ -86,40 +86,40 @@ impl CharTable {
 }
 
 impl CharTable {
-    fn quotation_mark (mut self, ch: char) -> Self {
+    pub fn quotation_mark (mut self, ch: char) -> Self {
         self.quotation_mark_set.insert (ch);
         self
     }
 }
 
 impl CharTable {
-    fn space (mut self, ch: char) -> Self {
+    pub fn space (mut self, ch: char) -> Self {
         self.space_set.insert (ch);
         self
     }
 }
 
 impl CharTable {
-    fn char (mut self, ch: char) -> Self {
+    pub fn char (mut self, ch: char) -> Self {
         self.char_set.insert (ch);
         self
     }
 }
 
 impl CharTable {
-    fn char_p (&self, ch: char) -> bool {
+    pub fn char_p (&self, ch: char) -> bool {
         self.char_set.contains (&ch)
     }
 }
 
 impl CharTable {
-    fn space_p (&self, ch: char) -> bool {
+    pub fn space_p (&self, ch: char) -> bool {
         self.space_set.contains (&ch)
     }
 }
 
 impl CharTable {
-    fn quotation_mark_p (&self, ch: char) -> bool {
+    pub fn quotation_mark_p (&self, ch: char) -> bool {
         self.quotation_mark_set.contains (&ch)
     }
 }
